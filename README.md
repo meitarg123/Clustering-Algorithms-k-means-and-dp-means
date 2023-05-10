@@ -1,4 +1,7 @@
 
+תקציר:
+
+מימשנו את אלגוריתם k-means וdp-means ולאחר מכן ניתחנו את השינויים בתוצאות של האלגרויתמים על תמונה לפי שינוי ערכי k ו λ .
 
 אלגוריתם k-means
 
@@ -143,6 +146,3 @@ DPMeans:מבחינת אלגוריתם DPMeans ראינו כי הורדת ערכ�
 
 <img width="452" alt="Picture13" src="https://github.com/meitarg123/K-means/assets/100788290/551302ae-1d40-4d61-a38b-cfd9f5202897">
 
-סעיף 4: עבור הפרויקט הסופי שלנו בחרנו בפרויקט המוצע, מספר 1:
-
-Project #1: Extend the (P)DC-DP-means Algorithm to Streaming data
