@@ -32,7 +32,7 @@ If a central blob is initialized far from the groups created by `make_blobs`, it
 
 ![Initial Central Blob](https://github.com/meitarg123/K-means/assets/100788290/91b6196e-c443-4b12-b6a6-0f698157500f)
 
-1### Close Initialization of Central Points
+### Close Initialization of Central Points
 
 If two center points are initialized too close to each other, they probably won't move away from each other. The red plus signs are the initial values of the central points, while the black plus signs are the final values. As shown below, the points on the lower left side of the image did not move away, causing one group (green) to be divided into two different clusters.
 
