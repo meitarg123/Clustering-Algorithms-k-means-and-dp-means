@@ -1,148 +1,145 @@
+# Clustering Algorithms: k-means and dp-means
 
-תקציר:
+This project involves implementing and analyzing the k-means and dp-means clustering algorithms, particularly focusing on their performance on image data when varying the k and λ values.
 
-מימשנו את אלגוריתם k-means וdp-means ולאחר מכן ניתחנו את השינויים בתוצאות של האלגרויתמים על תמונה לפי שינוי ערכי k ו λ .
+## k-means Algorithm
 
-אלגוריתם k-means
+### Section 1: Description of the Algorithm and Its Implementation
 
-סעיף 1: תיאור האלגוריתם ומימושו
+The k-means algorithm is a widely used clustering technique that aims to partition a dataset into k clusters, where each data point belongs to the cluster with the nearest mean value.
 
-תחילה, מימשנו את אלגוריתם k-means כך שאתחול k הנקודות (אשר יהוו בסיום ההרצה מרכזי האשכולות השונים) התבצע באופן רנדומלי, בתוך טווח הערכים התחום על ידי ערכי ה-x וה-y המינימליים והמקסימליים מבין הנקודות הנתונות ב- Data set (אותו יש לציין, ייצרנו באמצעות ספריית sklearn ומתודת make\_blobs).
+#### Implementation Steps:
+1. **Initialization**: 
+   - Randomly initialize k points (called "centroids") within the range of the minimum and maximum x and y values of the dataset.
+   - The dataset is generated using the `make_blobs` method from the `sklearn` library.
 
-לאחר אתחול k הנקודות (ייקראו מעתה "נקודות מרכזיות"), ביצענו עדכונים חוזרים ונשנים של נקודות אלו לפי האלגוריתם הבא:
+2. **Iteration**:
+   - **Distance Calculation**: Compute the Euclidean distance between each data point and each centroid.
+   - **Assignment**: Assign each data point to the nearest centroid, forming k clusters.
+   - **Centroid Update**: Recalculate the centroids as the mean of all points assigned to each cluster.
+   - **Convergence Check**: Repeat the above steps until the centroids do not change between iterations or a maximum number of iterations is reached to prevent infinite loops.
 
-1. חישוב המרחק האוקלידי (ייקרא מעתה "מרחק") של כל נקודה בדאטה מכל נקודה מרכזית.
-2. הנקודות השונות מסווגות לקבוצות לפי הנקודה המרכזית הקרובה אליהן ביותר.
-3. הנקודות המרכזיות מחושבות שוב לפי ממוצע הנקודות ששייכות לכל נקודה מרכזית.
+The full implementation can be found in the attached Python file.
 
-סיום הלולאה מתרחש כשקבוצת הנקודות המרכזיות לא השתנתה בין שתי איטרציות של הלולאה.
+### Section 2: Examining the Implementation Performance
 
-על מנת להימנע מלולאה אין-סופית, הוספנו תנאי עצירה נוסף ללולאה המגביל את מספר האיטרציות.
+While the k-means algorithm generally performs well, we observed instances where the algorithm's performance was suboptimal. This was primarily due to the random initialization of centroids. We identified two main issues affecting performance:
 
-המימוש המלא מצורף כקובץ פייתון נפרד.
+In the following graphs, we colored the points we created using make_blobs in a different color, and each point is represented by a **different shape** according to the k-means classification
 
-סעיף 2: בחינת ביצועי המימוש
+### Initial Central Blob Issue
+If a central blob is initialized far from the groups created by `make_blobs`, it tends not to change its position, leading to errors. For example, in the figure below, the lower right plus sign represents a central point at the end of the run with coordinates \( x = 1.292 \), \( y = -1.725 \). Its initial coordinates were almost the same: \( x = 1.289 \), \( y = -1.724 \).
 
-על אף הצלחה יחסית, שמנו לב שבכמות ניכרת של איטרציות נצפו ביצועים פחות טובים של האלגוריתם. מתוך הבנה שאתחול הנקודות המרכזיות מתבצע באקראי, הצלחנו לתחקר ולזהות 2 בעיות עיקריות שהביאו לפגיעה בביצועי המימוש:
+![Initial Central Blob](https://github.com/meitarg123/K-means/assets/100788290/91b6196e-c443-4b12-b6a6-0f698157500f)
 
-בגרפים הבאים צבענו בצבע שונה את הנקודות שייצרנו באמצעות make\_blobs, וכל נקודה מיוצגת על ידי **צורה שונה** בהתאם לסיווג k-means.
+1### Close Initialization of Central Points
 
-1. בעיה ראשונה: אם נקודה מרכזית מאותחלת רחוק מהקבוצות שיוצרו על ידי make\_blobs, היא נוטה לא לשנות את מיקומה, ולהתקבע כטעות.
-2. 
-<img width="271" alt="Picture1" src="https://github.com/meitarg123/K-means/assets/100788290/91b6196e-c443-4b12-b6a6-0f698157500f">
+If two center points are initialized too close to each other, they probably won't move away from each other. The red plus signs are the initial values of the central points, while the black plus signs are the final values. As shown below, the points on the lower left side of the image did not move away, causing one group (green) to be divided into two different clusters.
 
-סימן הפלוס הימני תחתון הינו נקודה מרכזית בסיום ההרצה, ערכה x=1.292, y=-1.725
+![Close Initialization](https://github.com/meitarg123/K-means/assets/100788290/bee14e82-131d-4e62-8828-c0371b0538d7)
 
-מתחקור ההרצה ראינו כי ערכה באתחול היה כמעט זהה: x=1.289, y=-1,724
 
-1. אם שתי נקודות מרכזיות מאותחלות קרוב מדי אחת לשנייה, כנראה שהן לא יתרחקו אחת מהשנייה.
+From testing the effect of the value of parameter \( k \) on the performance of the algorithm, we noticed that the performance of k-means deteriorates as \( k \) increases. This is likely due to a higher chance of problematic initialization of the central points, leading to the issues described above. Below is an example of the grouping of 3 different central points that were initialized with close values.
 
-![Picture2](https://github.com/meitarg123/K-means/assets/100788290/bee14e82-131d-4e62-8828-c0371b0538d7)
+We emphasize that the k-means algorithm is suitable for classification problems where the number of different groups is known in advance. Therefore, when creating the dataset using `sklearn.datasets.make_blobs`, we create a number of groups corresponding to the parameter \( k \). As required, we scattered 1000 points in a two-dimensional space.
 
-סימני ה+ האדומים זה הערכים ההתחלתיים של הנקודות המרכזיות, ואילו ה+ השחורים זה הערכים הסופיים של הנקודות המרכזיות, ואכן ניתן לראות שהנקודות בצד שמאל למטה של התמונה לא התרחקו, וקבוצה אחת (הירוקה) חולקה לשני clusters שונים.
+![Effect of k](https://github.com/meitarg123/K-means/assets/100788290/c0642350-6817-44ca-9e52-0b1fccb6e7c8)
 
-מבדיקת השפעת ערכו של פרמטר k על ביצועי האלגוריתם, הבחנו כי הביצועים של k-means פחות טובים ככל שה-k גדל. זאת, להשערתנו, בשל סיכוי גבוה יותר לאתחול בעייתי של הנקודות המרכזיות, שיוביל לאחת משתי הבעיות שתוארו מעלה. בתמונה המובאת מטה ניתן לראות דוגמא להתקבצות של 3 נקודות מרכזיות שונות שאותחלו בערכים קרובים.
+## Improved Initialization Method
 
-נדגיש - כי אלגוריתם k-means מתאים לבעיות סיווג בהם ידועה כמות הקבוצות השונות מראש, ועל כן - ביצירת הדאטה-סט באמצעות sklearn.datasets.make\_blobs ייצרנו כמות קבוצות בדאטה הזהות לפרמטר k. כנדרש במשימה - פיזרנו 1000 נקודות במרחב דו-מימדי.
+To address these problems, we decided to initialize the \( k \) points differently:
 
-![Picture3](https://github.com/meitarg123/K-means/assets/100788290/c0642350-6817-44ca-9e52-0b1fccb6e7c8)
+1. Initialize the values of the first central point to be the same as one of the existing points in the dataset, chosen at random.
+2. For the remaining \( k-1 \) central points, use the following method:
+    1. For each point in the dataset, calculate the sum of its distances to all the central points calculated so far. Normalize this distance against the sum of all distances of all points from all centers.
+    2. Initialize the values of the next central point by drawing a random point from the dataset, with the probability of drawing a particular point proportional to the sum of its normalized distances.
 
+With this approach, the performance improves because the initial central point values necessarily match some points from the dataset, and the probability of initializing two central points too close to each other is reduced.
 
-על מנת להתמודד עם בעיות אלה, החלטנו לאתחל את k הנקודות בצורה אחרת:
+# dp-means algorithm
 
-1. נאתחל את ערכי הנקודה המרכזית הראשונה להיות זהים לאחת מהנקודות הקיימות ב- Data set, נקודה זו נבחרת באקראי.
-2. כעת, נאתחל בלולאה את k-1 הנקודות המרכזיות האחרות:
-  1. עבור כל נקודה ב Data set, נחשב את סכום המרחקים שלה לבין כל הנקודות המרכזיות שחושבו עד כה. בנוסף, ננרמל מרחק זה למול סכום כל המרחקים של כל הנקודות מכל המרכזים.
-  2. כדי לאתחל את ערכי הנקודה המרכזית הבאה, נגריל נקודה אקראית בData set - כשההסתברות להגריל נקודה מסוימת שווה ערך לסכום המרחקים המנורמל שלה.
+## Description
 
-כעת, ניתן היה לראות שהביצועים טובים יותר. זאת, משום שערכי הנקודה המרכזית ההתחלתיים בהכרח שווים לנקודה כלשהי מה- Data set, ומשום שבהסתברות נמוכה יותר נאתחל שתי נקודות מרכזיות קרוב מדי זו לזו.
+Unlike k-means, the dp-means algorithm doesn't require the number of clusters to be known in advance, making it suitable for various types of problems. The algorithm determines the number of clusters during runtime using a parameter λ.
 
-אלגוריתם dp-means
+### Algorithm Steps:
 
-סעיף 1: תיאור האלגוריתם ומימושו:
+1. Initialize a single central point by averaging all points in the dataset.
+2. Iterate through the dataset:
+   - Calculate the distance of each point from each central point.
+   - Find the minimum distance for each point.
+   - If the minimum distance is greater than λ, create a new central point.
+3. Repeat the process until convergence, where no new central points are created or the number of central points remains constant between iterations.
 
-בשונה מה-kmeans, באלגוריתם זה מספר הclusters להם מחולק הדאטה לא ידוע לנו מראש - ולכן הוא מתאים לסוג בעיות נוספות. האלגוריתם מוצא את מספר ה-clusters במהלך הריצה, תוך התחשבות בפרמטר λ, באופן הבא:
+## Performance Considerations
 
-מאתחלים נקודה מרכזית ראשונה יחידה על ידי הממוצע של כל הנקודות בדאטה סט. ומתחילים להריץ בלולאה:
+The value of λ represents the maximum Euclidean distance of a point from its nearest central point.
 
-בכל איטרציה בלולאה, עוברים על כל הנקודות בדאטה-סט: עבור כל נקודה בדאטה-סט, מחשבים את מרחקה מכל נקודה מרכזית ומוצאים את המרחק המינימלי עבורה. כעת, נבדוק האם מרחק מינימלי זה גדול מ- λ. במידה שכן - ניצור נקודה מרכזית חדשה, שערכיה שווים לנקודה אותה בדקנו. נמשיך לעבור על שאר הנקודות כשבסיום איטרציה, בדומה לk-means, כל נקודה "משויכת" לנקודה מרכזית מסוימת.
+- A small λ value (< half the distance between any two points) results in each point becoming a central point.
+- A large λ value may classify all points into one central point.
 
-בדומה לk-means, בכל איטרציה, לאחר מעבר על כל הנקודות בדאטה-סט באיטרציה, מתבצע מיטוב של הנקודות המרכזיות לפי ממוצע הנקודות ה"שייכות" אליהן בדאטה-סט.
+The optimal λ depends on:
 
-אם לא היה שינוי בערך הנקודות המרכזיות או בכמותן בין שתי איטרציות, האלגוריתם יחזור לבצע איטרציה נוספת של הלולאה.
+1. The number of groups in the dataset:
+   - Larger λ values work better with fewer groups.
+2. The distribution of points in space:
+   - Larger λ values optimize central points towards the center of large clusters.
+   - Smaller λ values create additional central points for large clusters.
 
-סעיף 2: בחינת ביצועי המימוש
+## Examples
 
-הערך λ מייצג את המרחק האוקלידי המקסימלי של נקודה בדאטה-סט מהנקודה המרכזית הקרובה ביותר אליה. על כן, ערך λ קטן מדי (למשל, קטן ממחצית המרחק בין כל 2 נקודות) יביא לכך (במימוש שלנו, בהעדר הגבלה על כמות הנקודות המרכזיות) שכל נקודה תהפוך נקודה מרכזית.
+### Example 1: λ = 1 (2 groups)
 
-בתמונה: ערך λ הוא 0.001
+![Example 1](https://github.com/meitarg123/K-means/assets/100788290/c382d8d3-1b78-4431-88c9-be5ca4c1852a)
 
+### Example 2: λ = 2 (2 groups)
 
-<img width="179" alt="Picture4" src="https://github.com/meitarg123/K-means/assets/100788290/2c7e8623-067e-4092-91a6-147bac68ed24">
+![Example 2](https://github.com/meitarg123/K-means/assets/100788290/6362fba9-c0af-4e48-90de-427120c150da)
 
+### Example 3: λ = 1.2 (4 groups)
 
-מצד שני, ערך λ גדול מדי יביא לכך שלא יווצרו נקודות מרכזיות חדשות כלל, וכל הנקודות יסווגו לנקודה מרכזית אחת.
+![Example 3](https://github.com/meitarg123/K-means/assets/100788290/a4afa174-d141-441d-b569-286994ae8eb1)
 
-בתמונה: ערך λ הוא 2.4
+### Example 4: λ = 1.7 (4 groups)
 
+![Example 4](https://github.com/meitarg123/K-means/assets/100788290/df3c0b60-2676-46a0-8e62-95873e56a4d1)
 
-<img width="187" alt="Picture5" src="https://github.com/meitarg123/K-means/assets/100788290/dbca836d-3803-45aa-83a2-36bda50812ba">
+#section3:
+# K-means vs DP-means
 
+## K-means
 
-על כן, ישנו אופטימום כלשהו בין 2 ערכי קיצון אלה. מבחינת ערכי λ הבחנו כי הערך האופטימלי של λ תלוי בכמה פרמטרים:
+### Description
 
-1. מספר הקבוצות בדאטה-סט: הערך של λ משפיע על כמות הנקודות המרכזיות שנוצרות, ערך λ גדול יביא ליצירת פחות נקודות מרכזיות, כשערך λ קטן יביא לתוצאה הפוכה. על כן, בהינתן מספר קטן של קבוצות בדאטה-סט - ערכי λ גדולים הביאו תוצאות טובות יותר.
+In the K-means algorithm applied to the Madril monkey image (512\*512), increasing the value of K resulted in better performance. However, for high K values (30 and up), there was no significant change in performance.
 
-בתמונה המצורפת ערכו של λ הוא 1, ו- 1000 הנקודות מפוזרות כ-2 קבוצות. ה "+" מייצגים את הנקודות המרכזיות בסיום ריצת האלגוריתם.
+### Observations
 
-<img width="195" alt="Picture6" src="https://github.com/meitarg123/K-means/assets/100788290/c382d8d3-1b78-4431-88c9-be5ca4c1852a">
+- Grouping of central points in the same group of close points in the data-set and their (unnecessary) division into different clusters.
+- Locating a central point far from any point in the data-set.
 
+These mistakes did not significantly affect the performance of the algorithm in the Mandrill monkey coloring task because proximity between two central points resulted in the same (or sufficiently similar) coloring of the output image. Also, a central point located far from any point in the data-set did not result in significant miscoloring (if any) of pixels in the output image.
 
-ובתמונה זו ערכו של λ הוא 2: כאמור, ניתן לראות סיווג נכון יותר של הדאטה-סט clusters
+### Running Time
 
-<img width="198" alt="Picture7" src="https://github.com/meitarg123/K-means/assets/100788290/6362fba9-c0af-4e48-90de-427120c150da">
+Higher K values predictably resulted in longer running times. For the first 4 images, the runtime was 9.4 seconds. For the last 4 images, the running time was 27.35 seconds.
 
-1. פיזור הנקודות במרחב: בקלאסטרים "גדולים" (בעלי רדיוס גדול) הגדלת ערך λ הביאה למיטוב נקודה מרכזית למרכז הקלאסטר, בעוד שהקטנת ערך λ הביאה ליצירת נקודות מרכזיות נוספות לאותו קלאסטר.
+## DP-means
 
-בתמונה המובאת מטה ערכו של λ הינו 1.2, כשפיזרנו 4 קבוצות של נקודות במרחב (לפי צבעים), האלגוריתם טעה בכך שסיווג חלק מהקבוצות ל-2 קלאסטרים שונים.
+### Description
 
-<img width="194" alt="Picture8" src="https://github.com/meitarg123/K-means/assets/100788290/a4afa174-d141-441d-b569-286994ae8eb1">
+In the DP-means algorithm, lowering the value of λ resulted in better performance. Lowering λ allows the algorithm to create more central points and classify more points in the dataset into more clusters as needed.
 
-זאת, לעומת ערך גדול יותר של λ (1.7), שהביאה לביצועים טובים יותר:
+### Observations
 
-<img width="219" alt="Picture9" src="https://github.com/meitarg123/K-means/assets/100788290/df3c0b60-2676-46a0-8e62-95873e56a4d1">
+- A high λ value resulted in the creation of few central points, leading to the classification of the points in the dataset into a small number of clusters.
+- Lowering the value of λ resulted in more iterations and central points creation, increasing running time but without significant impact on performance.
 
+### Examples
 
-באופן כללי , הקטנת **** λ **** גורמת ל  העדפת  יצירת נקודות מרכזיות חדשות ,  והגדלתו להתאמת הנקודות המרכזיות הקיימות.
-סעיף 3:
+- High λ value: Few central points, resulting in less diverse output image.
+- Low λ value: More iterations, more central points, closer to original image.
 
-Kmeans: מבחינת אלגוריתם Kmeans על תמונת קוף מדריל (512\*512), ניתן לראות (בתמונה המובאת מטה) שהגדלת ערכו של K הביאה לביצועים טובים יותר. 
-
-<img width="452" alt="Picture10" src="https://github.com/meitarg123/K-means/assets/100788290/7214f5d5-358d-4f3e-8efd-f83f34aea3c1">
-
-עבור ערכי k גבוהים (30 ואילך), ראינו שאין שינוי משמעותי בביצועי האלגוריתם.
-<img width="452" alt="Picture11" src="https://github.com/meitarg123/K-means/assets/100788290/409712da-8f4a-4877-89e5-7debdee24a95">
-
-נציין כי על אף שבסעיף 1 טענו שהגדלת ערכי k מביאים לירידה בביצועי האלגוריתם, שתי הטעויות המרכזיות שאפיינו לאלגוריתם בסעיף 1:
-
-- התקבצות נקודות מרכזיות באותה קבוצת נקודות קרובות בדאטה-סט וחלוקה (מיותרת) שלהן לקלאסטרים שונים.
-- התמקמות נקודה מרכזית רחוק מכל נקודה בדאטה-סט.
-
-לא משפיעות על ביצועי האלגוריתם במשימת צביעת קוף המנדריל. זאת, משום שקרבה בין שתי נקודות מרכזיות תביא לצביעה זהה (או דומה מספיק) של תמונת הפלט. כמו כן, נקודה מרכזית שמוקמה רחוק מכל נקודה בדאטה-סט, לא תביא לצביעה שגויה משמעותית (אם בכלל) של פיקסלים בתמונת הפלט.
-
-זמן הריצה: ערכי K גבוהים הביאו כצפוי לזמני ריצה ארוכים יותר. עבור 4 התמונות הראשונות זמן הריצה היה 9.4 שניות. בעבור 4 התמונות האחרונות זמן הריצה היה 27.35 שניות.
-
-DPMeans:מבחינת אלגוריתם DPMeans ראינו כי הורדת ערכה של λ הביאה לביצועים טובים יותר של האלגוריתם.
-
-זאת, משום שהורדת ערכה של λ, מאפשר לאלגוריתם ליצור יותר נקודות מרכזיות ובכך להצליח לסווג יותר נקודות בדאטה-סט ליותר קלאסטרים בהתאם לצורך.
-
-ערך λ גבוה מדי יביא ליצירת מעט נקודות מרכזיות, ועל כן לסיווג הנקודות בדאטה-סט למספר מועט של clusters - מה שיביא לתמונת פלט פחות מגוונת (כפי שניתן לראות בתמונה המובאת מטה)
-
-<img width="452" alt="Picture12" src="https://github.com/meitarg123/K-means/assets/100788290/2c68e525-f64e-43a5-a295-cd5e6f56c934">
-
-הורדת ערכו של λ מביאה ליותר איטרציות (יצירה של יותר נקודות מרכזיות, ומיטובן) ועל כן כצפוי הורדת ערכו של λ הביאה לעלייה בזמן הריצה. אולם - זמן הריצה לא עלה באופן משמעותי.
-
-ערך λ נמוך מספיק מביא ליצירת נקודה מרכזית עבור כל נקודה בדאטה-סט (כפי שתיארנו בסעיפים 1-2), כך שאין שוני מהתמונה המקורית).
-
-<img width="452" alt="Picture13" src="https://github.com/meitarg123/K-means/assets/100788290/551302ae-1d40-4d61-a38b-cfd9f5202897">
+![High λ Value](https://github.com/meitarg123/K-means/assets/100788290/2c68e525-f64e-43a5-a295-cd5e6f56c934)
+![Low λ Value](https://github.com/meitarg123/K-means/assets/100788290/551302ae-1d40-4d61-a38b-cfd9f5202897)
 
