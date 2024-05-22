@@ -104,8 +104,7 @@ The optimal λ depends on:
 
 ![Example 4](https://github.com/meitarg123/K-means/assets/100788290/df3c0b60-2676-46a0-8e62-95873e56a4d1)
 
-#section3:
-# K-means vs DP-means
+# Image Clustering: Comparing K-means and DP-means
 
 ## K-means
 
